@@ -1,8 +1,9 @@
 # easy-nrm
 
 [![NPM version][npm-image]][npm-url]
+[![License][license-image]][license-url]
 
-`easy-nrm` is an easy way to install packages by different npm registries using nrm.
+> `easy-nrm` is an easy way to install packages by different npm registries using nrm.
 
 
 
