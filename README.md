@@ -1,6 +1,7 @@
 # easy-nrm
 
-[![NPM version](https://img.shields.io/npm/v/easy-nrm.svg?style=flat)](https://www.npmjs.com/package/easy-nrm) 
+[![NPM version][npm-image]][npm-url]
+[![NPM][nodei-image]][nodei-url]
 
 > `easy-nrm` is an easy way to install packages by different npm registries using nrm.
 
@@ -78,5 +79,7 @@ Commands:
 
 MIT
 
-
-
+[npm-image]: https://img.shields.io/npm/v/easy-nrm.svg?style=flat
+[npm-url]: https://www.npmjs.com/package/easy-nrm
+[nodei-image]: https://nodei.co/npm/easy-nrm.png?downloads=true&downloadRank=true&stars=true
+[nodei-url]: https://www.npmjs.com/package/easy-nrm
