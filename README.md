@@ -1,7 +1,6 @@
 # easy-nrm
 
-[![NPM version][npm-image]][npm-url]
-[![License][license-image]][license-url]
+[![NPM version](https://img.shields.io/npm/v/easy-nrm.svg?style=flat)](https://www.npmjs.com/package/easy-nrm) 
 
 > `easy-nrm` is an easy way to install packages by different npm registries using nrm.
 
