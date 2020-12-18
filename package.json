@@ -1,6 +1,6 @@
 {
   "name": "easy-nrm",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "An easy way to install packages by different npm registries using nrm",
   "bin": "./cli/index.js",
   "scripts": {
