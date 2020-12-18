@@ -183,9 +183,12 @@ function getCurrentRegistryName(currentRegistry) {
         if (checkPackageName(configJson).length) return;
 
         getCurrentRegistry((currentRegistryUrl) => {
-          const name = getCurrentRegistryName(currentRegistryUrl);
+          const name = getCurrentRegistryName(currentRegistryUrl); // npm
 
-          if (configJson[name]) {
+          if (configJson[name] ||
+              `${configJson[name]} -D` ||
+              `${configJson[name]} --save-dev`
+          ) {
             const composePromise = function(pkgList) {
               const promiseArray = [];
               for (let i = 0, length = pkgList.length; i < length; i++) {
