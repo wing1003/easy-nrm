@@ -183,7 +183,7 @@ function getCurrentRegistryName(currentRegistry) {
         if (checkPackageName(configJson).length) return;
 
         getCurrentRegistry((currentRegistryUrl) => {
-          const name = getCurrentRegistryName(currentRegistryUrl); // npm
+          const name = getCurrentRegistryName(currentRegistryUrl);
 
           if (configJson[name] ||
               `${configJson[name]} -D` ||
