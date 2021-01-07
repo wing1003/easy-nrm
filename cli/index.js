@@ -24,10 +24,12 @@ const GLOBAL_NPM_PATH = {
 const registries = require('../registries.json');
 const NRMRC = path.join(process.env.HOME, '.nrmrc');
 const configJson = require(paths.configJson);
+const appPackageJson = require(paths.appPackageJson);
 const FIELD_REGISTRY = 'registry';
 const FIELD_NRM = 'nrm';
 const FIELD_NPM = 'npm';
 const REG_DEV = /(\s-D|\s--save-dev)$/;
+const configJsonDeps = [];
 
 function getGlobalNpmPath() {
   const type = os.type();
@@ -163,6 +165,12 @@ function getCurrentRegistryName(currentRegistry) {
   })[0];
 }
 
+function checkRestAppDependencies() {
+  const allDep = Object.keys(appPackageJson.dependencies)
+      .concat(Object.keys(appPackageJson.devDependencies));
+  return allDep === configJsonDeps;
+}
+
 (function init() {
   const program = new commander.Command(packageJson.name);
 
@@ -193,6 +201,7 @@ function getCurrentRegistryName(currentRegistry) {
               const promiseArray = [];
               for (let i = 0, length = pkgList.length; i < length; i++) {
                 let name = pkgList[i];
+                configJsonDeps.concat(configJson[name]);
                 promiseArray.push(
                     () => changeRegister(name),
                     () => install(name, configJson[name])
@@ -200,8 +209,30 @@ function getCurrentRegistryName(currentRegistry) {
               }
               return promiseArray;
             }
+            const promiseArray = composePromise(Object.keys(configJson));
+            if (!checkRestAppDependencies()) {
+              Object.keys(configJson).forEach(pkg => {
+                configJson[pkg].forEach(depName => {
+                  if (appPackageJson.devDependencies[depName]) {
+                    delete appPackageJson.devDependencies[depName]
+                  }
+                  delete appPackageJson.dependencies[depName];
+                })
+              });
 
-            composePromise(Object.keys(configJson)).reduce((promise, next) => {
+              promiseArray.push(() => changeRegister(FIELD_NPM));
+              if (Object.keys(appPackageJson.devDependencies).length) {
+                promiseArray.push(
+                    () => install(`${FIELD_NPM} -D`, Object.keys(appPackageJson.devDependencies))
+                )
+              }
+              if (Object.keys(appPackageJson.dependencies).length) {
+                promiseArray.push(
+                    () => install(FIELD_NPM, Object.keys(appPackageJson.dependencies))
+                )
+              }
+            }
+            promiseArray.reduce((promise, next) => {
               return promise.then(value => next(value));
             }, Promise.resolve())
                 .then(success => {
