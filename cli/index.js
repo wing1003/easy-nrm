@@ -19,7 +19,7 @@ const { unique } = require('../util');
 const GLOBAL_NPM_PATH = {
   'Darwin': '/lib/node_modules', // mac
   'Windows_NT': '/node_modules', // windows
-  'Linux': '/node_modules' // linux
+  'Linux': '/lib/node_modules' // linux
 };
 const registries = require('../registries.json');
 const NRMRC = path.join(process.env.HOME, '.nrmrc');
@@ -47,7 +47,7 @@ function getGlobalNpmPath() {
 }
 
 function checkGlobalPackageExisted(name) {
-  const node_prefix = process.config.variables.node_prefix;
+  const node_prefix = path.resolve(process.execPath, '..', '..')
   const globalPackages = fs.readdirSync(path.join(node_prefix, getGlobalNpmPath()));
   return globalPackages.findIndex(packageName => packageName === name) !== -1;
 }
