@@ -7,20 +7,15 @@ const spawn = require('cross-spawn');
 const chalk = require('chalk');
 const path = require('path');
 const fs = require('fs');
-const os = require('os');
 const ini = require('ini');
 const npm = require('npm');
 const extend = require('extend');
+const getPath = require('npm-global-path');
 
 const packageJson = require('../package.json');
 const paths = require('../paths');
 const { unique } = require('../util');
 
-const GLOBAL_NPM_PATH = {
-  'Darwin': '/lib/node_modules', // mac
-  'Windows_NT': '/node_modules', // windows
-  'Linux': '/lib/node_modules' // linux
-};
 const registries = require('../registries.json');
 const NRMRC = path.join(process.env.HOME, '.nrmrc');
 const configJson = require(paths.configJson);
@@ -31,24 +26,8 @@ const FIELD_NPM = 'npm';
 const REG_DEV = /(\s-D|\s--save-dev)$/;
 const configJsonDeps = [];
 
-function getGlobalNpmPath() {
-  const type = os.type();
-  const npmPath = GLOBAL_NPM_PATH[type];
-  if (npmPath) {
-    return npmPath;
-  } else {
-    console.error(
-        chalk.red(
-            'You cannot install easy-nrm in %s operating system that is not supported.'
-        ),
-        type,
-    );
-  }
-}
-
 function checkGlobalPackageExisted(name) {
-  const node_prefix = path.resolve(process.execPath, '..', '..')
-  const globalPackages = fs.readdirSync(path.join(node_prefix, getGlobalNpmPath()));
+  const globalPackages = fs.readdirSync(getPath());
   return globalPackages.findIndex(packageName => packageName === name) !== -1;
 }
 
