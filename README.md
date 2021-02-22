@@ -23,10 +23,12 @@ At the root of project, create the file`easy-nrm.config.json`.
 
 ```json
 {
-  "my-npm": ["pkg1"],
-  "my-npm -D": ["pkg2@0.1.0"],
-  "my-npm2": ["pkg3"],
-  "npm": ["pkg4"]
+  "registries": {
+    "my-npm": ["pkg1"],
+    "my-npm -D": ["pkg2@0.1.0"],
+    "my-npm2": ["pkg3"],
+    "npm": ["pkg4"]
+  }
 }
 ```
 
@@ -34,10 +36,12 @@ If you want to install some packages when you in dev mode, you should add `-D` o
 
 ```json
 {
-  "my-npm": ["pkg1"],
-  "my-npm --save-dev": ["pkg2", "pkg3"],
-  "my-npm-2": ["pkg4"],
-  "my-npm-2 -D": ["pkg5"]
+  "registries": {
+    "my-npm": ["pkg1"],
+    "my-npm --save-dev": ["pkg2", "pkg3"],
+    "my-npm-2": ["pkg4"],
+    "my-npm-2 -D": ["pkg5"]
+  }
 }
 ```
 
@@ -47,7 +51,9 @@ If you want to install a specified version of a package, add `@<version>` at the
 
 ```json
 {
-  "my-npm": ["pkg1@1.0.1", "pkg2"]
+  "registries": {
+    "my-npm": ["pkg1@1.0.1", "pkg2"]
+  }
 }
 ```
 
@@ -66,7 +72,13 @@ Commands:
   
 ```
 
-
+## Available props
+The `easy-nrm.config.js`accepts these props:
+|Attribute|Type|Required|Default|Description|
+|-|-|-|-|-|
+|registries|Object|true|-|The packages in different registry|
+|default_registry|String|false|npm|Which registry when auto_install is true|
+|auto_install|Boolean|false|-|Install the dependencies of the project without which in config file|
 
 ## Related Projects
 

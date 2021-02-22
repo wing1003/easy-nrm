@@ -31,9 +31,9 @@ function checkGlobalPackageExisted(name) {
   return globalPackages.findIndex(packageName => packageName === name) !== -1;
 }
 
-function install(packageName, dependencies) {
+function install(registerName, dependencies) {
   return new Promise((resolve, reject) => {
-    const isDev = REG_DEV.test(packageName) ? '--save-dev' : '--save';
+    const isDev = REG_DEV.test(registerName) ? '--save-dev' : '--save';
     const args = [
       'install',
       isDev,
@@ -55,9 +55,9 @@ function install(packageName, dependencies) {
   });
 }
 
-function checkPackageName(PackageConfig) {
+function checkPackageName(registries) {
   let dependencies = [];
-  for (const [lib, packageName] of Object.entries(PackageConfig)) {
+  for (const [lib, packageName] of Object.entries(registries)) {
     dependencies = dependencies.concat(packageName);
   }
   const { result, hash } = unique(dependencies);
@@ -159,6 +159,10 @@ function checkRestAppDependencies() {
       .alias('i')
       .description('install all the packages')
       .action(() => {
+        const registries = configJson.registries;
+        const default_registry = configJson.default_registry;
+        const auto_install = configJson.auto_install;
+
         if (!checkGlobalPackageExisted(FIELD_NRM)) {
           console.log(
               chalk.red(
@@ -167,31 +171,31 @@ function checkRestAppDependencies() {
           )
         }
 
-        if (checkPackageName(configJson).length) return;
+        if (checkPackageName(registries).length) return;
 
         getCurrentRegistry((currentRegistryUrl) => {
           const name = getCurrentRegistryName(currentRegistryUrl);
 
-          if (configJson[name] ||
-              `${configJson[name]} -D` ||
-              `${configJson[name]} --save-dev`
+          if (registries[name] ||
+              `${registries[name]} -D` ||
+              `${registries[name]} --save-dev`
           ) {
             const composePromise = function(pkgList) {
               const promiseArray = [];
               for (let i = 0, length = pkgList.length; i < length; i++) {
                 let name = pkgList[i];
-                configJsonDeps.concat(configJson[name]);
+                configJsonDeps.concat(registries[name]);
                 promiseArray.push(
                     () => changeRegister(name),
-                    () => install(name, configJson[name])
+                    () => install(name, registries[name])
                 );
               }
               return promiseArray;
             }
-            const promiseArray = composePromise(Object.keys(configJson));
-            if (!checkRestAppDependencies()) {
-              Object.keys(configJson).forEach(pkg => {
-                configJson[pkg].forEach(depName => {
+            const promiseArray = composePromise(Object.keys(registries));
+            if (!checkRestAppDependencies() && auto_install) {
+              Object.keys(registries).forEach(pkg => {
+                registries[pkg].forEach(depName => {
                   if (appPackageJson.devDependencies[depName]) {
                     delete appPackageJson.devDependencies[depName]
                   }
@@ -199,15 +203,16 @@ function checkRestAppDependencies() {
                 })
               });
 
-              promiseArray.push(() => changeRegister(FIELD_NPM));
+              const register = default_registry || FIELD_NPM;
+              promiseArray.push(() => changeRegister(register));
               if (Object.keys(appPackageJson.devDependencies).length) {
                 promiseArray.push(
-                    () => install(`${FIELD_NPM} -D`, Object.keys(appPackageJson.devDependencies))
+                    () => install(`${register} -D`, Object.keys(appPackageJson.devDependencies))
                 )
               }
               if (Object.keys(appPackageJson.dependencies).length) {
                 promiseArray.push(
-                    () => install(FIELD_NPM, Object.keys(appPackageJson.dependencies))
+                    () => install(register, Object.keys(appPackageJson.dependencies))
                 )
               }
             }
